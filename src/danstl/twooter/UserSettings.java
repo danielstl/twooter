@@ -1,3 +1,5 @@
+package danstl.twooter;
+
 public class UserSettings {
 
     private String userName;

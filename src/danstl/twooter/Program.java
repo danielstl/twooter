@@ -1,4 +1,6 @@
-import gui.HomePage;
+package danstl.twooter;
+
+import danstl.twooter.gui.HomePage;
 import twooter.TwooterClient;
 
 import java.io.IOException;
