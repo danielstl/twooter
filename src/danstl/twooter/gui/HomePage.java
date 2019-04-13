@@ -12,9 +12,12 @@ public class HomePage {
     private JButton composeButton;
     private JLabel accountLabel;
 
+    private TwooterClient client;
     private AccountDetails details;
 
     public HomePage(TwooterClient client) {
+        this.client = client;
+
         JFrame frame = new JFrame();
 
         frame.setTitle("Twooter");
@@ -39,6 +42,6 @@ public class HomePage {
     }
 
     private void composeTweet() {
-        System.out.println("todo");
+        new ComposeTwootPage(details, client);
     }
 }

@@ -21,12 +21,12 @@ public class ChooseAccountPage {
     public ChooseAccountPage(TwooterClient client) {
         this.client = client;
 
-        dialog = new JDialog((JFrame) null, true);
+        dialog = new JDialog((JFrame) null, "Choose Your Account", true);
 
         dialog.setLayout(new GridLayout());
 
         userNameField = new JTextField();
-        confirmButton = new JButton();
+        confirmButton = new JButton("Confirm");
 
         confirmButton.addActionListener(e -> checkName(userNameField.getText()));
 
