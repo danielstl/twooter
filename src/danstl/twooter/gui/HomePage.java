@@ -2,6 +2,11 @@ package danstl.twooter.gui;
 
 import danstl.twooter.AccountDetails;
 import danstl.twooter.AccountManager;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import twooter.TwooterClient;
 
 import javax.swing.*;
@@ -9,8 +14,8 @@ import java.awt.*;
 
 public class HomePage {
 
-    private JButton composeButton;
-    private JLabel accountLabel;
+    private Button composeButton;
+    private Text accountLabel;
 
     private TwooterClient client;
     private AccountDetails details;
@@ -18,27 +23,30 @@ public class HomePage {
     public HomePage(TwooterClient client) {
         this.client = client;
 
-        JFrame frame = new JFrame();
+        new PostFeed(client);
 
-        frame.setTitle("Twooter");
-        frame.setLayout(new GridLayout());
+        StackPane container = new StackPane();
 
-        frame.add(new JLabel("Twooter"));
+        Scene scene = new Scene(container,600, 400);
 
-        composeButton = new JButton("Compose Twoot");
-        composeButton.addActionListener(e -> composeTweet());
+        container.getChildren().add(new Text("Twooter"));
 
-        frame.add(composeButton);
+        composeButton = new Button("Compose Twoot");
+        composeButton.setOnAction(e -> composeTweet());
+
+        container.getChildren().add(composeButton);
 
         details = new AccountManager(client).getAccount();
 
-        accountLabel = new JLabel(details.getUserName());
+        accountLabel = new Text(details.getUserName());
 
-        frame.add(accountLabel);
+        container.getChildren().add(accountLabel);
 
-        frame.setSize(600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("Twooter");
+        stage.setScene(scene);
 
-        frame.setVisible(true);
+        stage.show();
     }
 
     private void composeTweet() {

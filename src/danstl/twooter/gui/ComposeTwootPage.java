@@ -1,17 +1,25 @@
 package danstl.twooter.gui;
 
 import danstl.twooter.AccountDetails;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import twooter.TwooterClient;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 
 public class ComposeTwootPage {
 
-    private JDialog dialog;
-    private JTextArea textArea;
-    private JButton confirmButton;
+    private Stage stage;
+
+    private TextArea textArea;
+    private Button confirmButton;
 
     private AccountDetails details;
     private TwooterClient client;
@@ -20,37 +28,47 @@ public class ComposeTwootPage {
         this.details = details;
         this.client = client;
 
-        dialog = new JDialog((JFrame) null, "Compose Twoot", true);
+        stage = new Stage();
 
-        dialog.setLayout(new GridLayout());
+        StackPane container = new StackPane();
 
-        textArea = new JTextArea();
-        confirmButton = new JButton("Post");
+        Text twootLabel = new Text("What do you want to twoot?");
 
-        confirmButton.addActionListener(e -> publishTwoot(textArea.getText()));
+        textArea = new TextArea();
+        confirmButton = new Button("Post");
 
-        dialog.add(textArea);
-        dialog.add(confirmButton);
+        confirmButton.setOnAction(e -> publishTwoot(textArea.getText()));
 
-        dialog.setSize(500, 300);
-        dialog.setVisible(true);
+        container.getChildren().add(twootLabel);
+        container.getChildren().add(textArea);
+        container.getChildren().add(confirmButton);
+
+        Scene scene = new Scene(container, 500, 300);
+        stage.setTitle("Compose Twoot");
+        stage.setScene(scene);
+
+        stage.showAndWait();
     }
 
     private void publishTwoot(String content) {
         if (content == null || content.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Failed to post empty twoot!");
+            showError("Failed to post empty twoot!");
             return;
         }
 
         try {
             String res = client.postMessage(details.getToken(), details.getUserName(), content);
-            JOptionPane.showMessageDialog(null, "Posted twoot! " + res);
+            showError("Posted twoot! " + res);
 
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Network error posting twoot!");
+            showError("Network error posting twoot!");
             ex.printStackTrace();
         }
 
-        dialog.setVisible(false);
+        stage.close();
+    }
+
+    private void showError(String error) {
+        new Alert(Alert.AlertType.ERROR, error, ButtonType.OK).showAndWait();
     }
 }

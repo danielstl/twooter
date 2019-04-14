@@ -1,18 +1,21 @@
 package danstl.twooter.gui;
 
 import danstl.twooter.AccountDetails;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import twooter.TwooterClient;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 
 public class ChooseAccountPage {
 
-    private JDialog dialog;
+    private Stage stage;
 
-    private JTextField userNameField;
-    private JButton confirmButton;
+    private TextField userNameField;
+    private Button confirmButton;
 
     private TwooterClient client;
 
@@ -21,20 +24,23 @@ public class ChooseAccountPage {
     public ChooseAccountPage(TwooterClient client) {
         this.client = client;
 
-        dialog = new JDialog((JFrame) null, "Choose Your Account", true);
+        stage = new Stage();
 
-        dialog.setLayout(new GridLayout());
+        StackPane container = new StackPane();
 
-        userNameField = new JTextField();
-        confirmButton = new JButton("Confirm");
+        userNameField = new TextField();
+        confirmButton = new Button("Confirm");
 
-        confirmButton.addActionListener(e -> checkName(userNameField.getText()));
+        confirmButton.setOnAction(e -> checkName(userNameField.getText()));
 
-        dialog.add(userNameField);
-        dialog.add(confirmButton);
+        container.getChildren().add(userNameField);
+        container.getChildren().add(confirmButton);
 
-        dialog.setSize(300, 300);
-        dialog.setVisible(true);
+        Scene scene = new Scene(container, 300, 300);
+        stage.setTitle("Choose Your Account");
+        stage.setScene(scene);
+
+        stage.showAndWait();
     }
 
     private void checkName(String name) {
@@ -45,8 +51,7 @@ public class ChooseAccountPage {
                 selectedName = name;
                 accountToken = token;
 
-                dialog.setVisible(false);
-                dialog.dispose();
+                stage.close();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
