@@ -1,17 +1,17 @@
 package danstl.twooter.gui;
 
 import danstl.twooter.AccountDetails;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import twooter.TwooterClient;
 
-import javax.swing.*;
 import java.io.IOException;
 
 public class ComposeTwootPage {
@@ -30,7 +30,8 @@ public class ComposeTwootPage {
 
         stage = new Stage();
 
-        StackPane container = new StackPane();
+        BorderPane container = new BorderPane();
+        container.setPadding(new Insets(10, 10, 10, 10));
 
         Text twootLabel = new Text("What do you want to twoot?");
 
@@ -39,9 +40,9 @@ public class ComposeTwootPage {
 
         confirmButton.setOnAction(e -> publishTwoot(textArea.getText()));
 
-        container.getChildren().add(twootLabel);
-        container.getChildren().add(textArea);
-        container.getChildren().add(confirmButton);
+        container.setTop(twootLabel);
+        container.setCenter(textArea);
+        container.setBottom(confirmButton);
 
         Scene scene = new Scene(container, 500, 300);
         stage.setTitle("Compose Twoot");

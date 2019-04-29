@@ -2,20 +2,26 @@ package danstl.twooter.gui;
 
 import danstl.twooter.AccountDetails;
 import danstl.twooter.AccountManager;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import twooter.Message;
 import twooter.TwooterClient;
 
-import javax.swing.*;
-import java.awt.*;
+import java.io.IOException;
 
 public class HomePage {
 
     private Button composeButton;
     private Text accountLabel;
+
+    private ListView<Message> messages;
 
     private TwooterClient client;
     private AccountDetails details;
@@ -25,31 +31,55 @@ public class HomePage {
 
         new PostFeed(client);
 
-        StackPane container = new StackPane();
+        BorderPane container = new BorderPane();
+        container.setPadding(new Insets(5));
 
-        Scene scene = new Scene(container,600, 400);
+        HBox header = new HBox();
+        header.setPadding(new Insets(5));
+        header.setSpacing(10);
+        header.setAlignment(Pos.CENTER);
 
-        container.getChildren().add(new Text("Twooter"));
+        container.setTop(header);
+
+        Scene scene = new Scene(container, 600, 400);
+
+        header.getChildren().add(new Text("Twooter"));
 
         composeButton = new Button("Compose Twoot");
-        composeButton.setOnAction(e -> composeTweet());
+        composeButton.setOnAction(e -> composeTwoot());
 
-        container.getChildren().add(composeButton);
+        header.getChildren().add(composeButton);
 
         details = new AccountManager(client).getAccount();
 
         accountLabel = new Text(details.getUserName());
 
-        container.getChildren().add(accountLabel);
+        header.getChildren().add(accountLabel);
+
+        messages = new ListView<>();
+
+        messages.setCellFactory(param -> new MessageCell());
+
+        container.setCenter(messages);
 
         Stage stage = new Stage();
         stage.setTitle("Twooter");
         stage.setScene(scene);
 
         stage.show();
+
+        loadTwoots();
     }
 
-    private void composeTweet() {
+    private void loadTwoots() {
+        try {
+            messages.getItems().addAll(client.getMessages());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void composeTwoot() {
         new ComposeTwootPage(details, client);
     }
 }

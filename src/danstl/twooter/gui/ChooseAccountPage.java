@@ -1,10 +1,14 @@
 package danstl.twooter.gui;
 
 import danstl.twooter.AccountDetails;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import twooter.TwooterClient;
 
@@ -26,13 +30,25 @@ public class ChooseAccountPage {
 
         stage = new Stage();
 
-        StackPane container = new StackPane();
+        VBox container = new VBox();
+        container.setSpacing(10);
+        container.setPadding(new Insets(10));
 
         userNameField = new TextField();
         confirmButton = new Button("Confirm");
 
         confirmButton.setOnAction(e -> checkName(userNameField.getText()));
 
+        Text welcomeText = new Text("Welcome to Twooter");
+        welcomeText.setTextAlignment(TextAlignment.CENTER);
+        welcomeText.setFont(Font.font(22f));
+
+        Text nameText = new Text("Choose your name");
+        nameText.setTextAlignment(TextAlignment.CENTER);
+        nameText.setFont(Font.font(20f));
+
+        container.getChildren().add(welcomeText);
+        container.getChildren().add(nameText);
         container.getChildren().add(userNameField);
         container.getChildren().add(confirmButton);
 
