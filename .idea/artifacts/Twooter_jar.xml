@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Twooter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Twooter_jar</output-path>
+    <root id="archive" name="Twooter.jar">
+      <element id="module-output" name="Twooter" />
+      <element id="library" level="project" name="twooter" />
+    </root>
+  </artifact>
+</component>
