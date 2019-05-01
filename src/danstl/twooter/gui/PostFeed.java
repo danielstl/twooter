@@ -55,7 +55,7 @@ public class PostFeed implements UpdateListener {
             System.out.println("New message: " + e.payload);
 
             try {
-                messages.add(client.getMessage(e.payload)); //try to add the message
+                messages.add(0, client.getMessage(e.payload)); //try to add the message
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
