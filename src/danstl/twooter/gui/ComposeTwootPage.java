@@ -53,23 +53,19 @@ public class ComposeTwootPage {
 
     private void publishTwoot(String content) {
         if (content == null || content.isEmpty()) {
-            showError("Failed to post empty twoot!");
+            Utils.showMessage(Alert.AlertType.ERROR, "Failed to post empty twoot!");
             return;
         }
 
         try {
             String res = client.postMessage(details.getToken(), details.getUserName(), content);
-            showError("Posted twoot! " + res);
+            Utils.showMessage(Alert.AlertType.INFORMATION, "Posted twoot! " + res);
 
         } catch (IOException ex) {
-            showError("Network error posting twoot!");
+            Utils.showMessage(Alert.AlertType.ERROR, "Network error posting twoot!");
             ex.printStackTrace();
         }
 
         stage.close();
-    }
-
-    private void showError(String error) {
-        new Alert(Alert.AlertType.ERROR, error, ButtonType.OK).showAndWait();
     }
 }
