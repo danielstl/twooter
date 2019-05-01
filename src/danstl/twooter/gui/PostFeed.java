@@ -1,5 +1,6 @@
 package danstl.twooter.gui;
 
+import javafx.collections.ObservableList;
 import twooter.Message;
 import twooter.TwooterClient;
 import twooter.TwooterEvent;
@@ -10,22 +11,39 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Twooter post feed, handles fetching messages and updating when new messages are received.
+ * Implements the Twooter UpdateListener interface to listen for messages
+ */
 public class PostFeed implements UpdateListener {
 
-    private List<Message> messages;
+    private ObservableList<Message> messages; //the observablelist to update when we get new twoots
+    private TwooterClient client; //the client to hook the update listener to
 
-    public PostFeed(TwooterClient client) {
-        client.enableLiveFeed();
+    /**
+     * Creates a post feed listener
+     * @param messagesList the list to update when receiveing new messages
+     * @param client the client instance
+     */
+    public PostFeed(ObservableList<Message> messagesList, TwooterClient client) {
+        this.client = client;
+
+        client.enableLiveFeed(); //to allow the updates to work
         client.addUpdateListener(this);
 
+        messages = messagesList;
+
         try {
-            messages = new ArrayList<>(Arrays.asList(client.getMessages()));
+            messages.addAll(client.getMessages()); //to make mutable
         } catch (IOException ex) {
             System.err.println("Error fetching messages");
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Handles the TwooterEvent. Filters for message events and adds them to the messages list
+     */
     @Override
     public void handleUpdate(TwooterEvent e) {
         System.out.println("ev:");
@@ -35,6 +53,12 @@ public class PostFeed implements UpdateListener {
 
         if (e.type == TwooterEvent.MESSAGE) {
             System.out.println("New message: " + e.payload);
+
+            try {
+                messages.add(client.getMessage(e.payload)); //try to add the message
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import twooter.Message;
@@ -28,8 +29,6 @@ public class HomePage {
 
     public HomePage(TwooterClient client) {
         this.client = client;
-
-        new PostFeed(client);
 
         BorderPane container = new BorderPane();
         container.setPadding(new Insets(5));
@@ -60,6 +59,8 @@ public class HomePage {
 
         messages.setCellFactory(param -> new MessageCell());
 
+        new PostFeed(messages.getItems(), client); //post feed handles fetching messages and live updates
+
         container.setCenter(messages);
 
         Stage stage = new Stage();
@@ -67,16 +68,6 @@ public class HomePage {
         stage.setScene(scene);
 
         stage.show();
-
-        loadTwoots();
-    }
-
-    private void loadTwoots() {
-        try {
-            messages.getItems().addAll(client.getMessages());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
     }
 
     private void composeTwoot() {
