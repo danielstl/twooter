@@ -1,5 +1,6 @@
 package danstl.twooter.gui;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import twooter.Message;
 import twooter.TwooterClient;
@@ -55,7 +56,9 @@ public class PostFeed implements UpdateListener {
             System.out.println("New message: " + e.payload);
 
             try {
-                messages.add(0, client.getMessage(e.payload)); //try to add the message
+                Message msg = client.getMessage(e.payload);
+                if (msg == null) return;
+                Platform.runLater(() -> messages.add(0, msg)); //run on the fx application thread to stop exception
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
