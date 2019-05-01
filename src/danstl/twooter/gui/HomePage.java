@@ -51,7 +51,7 @@ public class HomePage {
 
         details = new AccountManager(client).getAccount();
 
-        accountLabel = new Text(details.getUserName());
+        accountLabel = new Text(details == null ? "<Not logged in>" : details.getUserName());
 
         header.getChildren().add(accountLabel);
 

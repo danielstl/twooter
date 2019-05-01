@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import twooter.TwooterClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Class for the account picker window. Will allow the user to pick a username if there is not already existing details saved
@@ -81,7 +82,7 @@ public class ChooseAccountPage {
             String token = client.registerName(userNameField.getText());
 
             if (token != null) {
-                accountDetails = new AccountDetails(name, token);
+                accountDetails = new AccountDetails(name, token, new ArrayList<>());
 
                 return true;
             }
