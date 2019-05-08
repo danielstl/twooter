@@ -23,7 +23,7 @@ public class JsonTwoot {
 
         if (text.startsWith(PAYLOAD_NAME)) { //if it starts with the json header
             try {
-                return new Gson().fromJson(text, JsonTwoot.class); //attempt to resolve into json
+                return new Gson().fromJson(text.substring(PAYLOAD_NAME.length()), JsonTwoot.class); //attempt to resolve into json
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

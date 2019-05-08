@@ -20,7 +20,7 @@ public class MessageCell extends ListCell<Message> {
         if (json == null) { //a normal twoot
             setText(item.name + "\n" + item.message);
         } else {
-            setText(item.name + "\n" + json.getText() + "\n" + json.getAgent());
+            setText(item.name + (json.getImages().length != 0 ? " - This twoot contains images" : "") + "\n" + json.getText() + "\n" + json.getAgent());
         }
     }
 }
