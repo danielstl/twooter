@@ -7,15 +7,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import twooter.Message;
 import twooter.TwooterClient;
-
-import java.io.IOException;
 
 public class HomePage {
 
@@ -40,7 +38,7 @@ public class HomePage {
 
         container.setTop(header);
 
-        Scene scene = new Scene(container, 600, 400);
+        Scene scene = new Scene(container, 1000, 800);
 
         header.getChildren().add(new Text("Twooter"));
 
@@ -58,6 +56,16 @@ public class HomePage {
         messages = new ListView<>();
 
         messages.setCellFactory(param -> new MessageCell());
+
+        messages.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
+
+                Message selected = messages.getSelectionModel().getSelectedItem();
+
+                new ViewTwootPage(selected, client);
+                //your code here
+            }
+        });
 
         new PostFeed(messages.getItems(), client); //post feed handles fetching messages and live updates
 
