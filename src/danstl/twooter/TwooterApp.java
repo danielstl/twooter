@@ -15,6 +15,8 @@ public class TwooterApp extends Application {
     public void start(Stage stage) {
         TwooterClient c = new TwooterClient();
 
+        UserSettings.load();
+
         new HomePage(c);
     }
 }

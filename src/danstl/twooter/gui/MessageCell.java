@@ -1,5 +1,6 @@
 package danstl.twooter.gui;
 
+import danstl.twooter.JsonTwoot;
 import javafx.scene.control.ListCell;
 import twooter.Message;
 
@@ -9,6 +10,17 @@ public class MessageCell extends ListCell<Message> {
     protected void updateItem(Message item, boolean empty) {
         super.updateItem(item, empty);
 
-        setText(item == null ? "Empty message" : item.name + "\n" + item.message);
+        if (item == null) {
+            setText("Empty message");
+            return;
+        }
+
+        JsonTwoot json = JsonTwoot.resolve(item.message);
+
+        if (json == null) { //a normal twoot
+            setText(item.name + "\n" + item.message);
+        } else {
+            setText(item.name + "\n" + json.getText() + "\n" + json.getAgent());
+        }
     }
 }
