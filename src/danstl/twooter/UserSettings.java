@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class UserSettings {
 
@@ -20,18 +21,28 @@ public class UserSettings {
         return instance;
     }
 
-    private String userName;
+    private AccountDetails details;
+    private List<String> followedAccounts;
 
     public UserSettings() {
 
     }
 
-    public String getUserName() {
-        return userName;
+    public AccountDetails getDetails() {
+        return details;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setDetails(AccountDetails details) {
+        this.details = details;
+        save();
+    }
+
+    public List<String> getFollowedAccounts() {
+        return followedAccounts;
+    }
+
+    public void setFollowedAccounts(List<String> followedAccounts) {
+        this.followedAccounts = followedAccounts;
         save();
     }
 

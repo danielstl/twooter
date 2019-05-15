@@ -29,8 +29,20 @@ public class PostFeed implements UpdateListener {
     public PostFeed(ObservableList<Message> messagesList, TwooterClient client) {
         this.client = client;
 
-        client.enableLiveFeed(); //to allow the updates to work
-        client.addUpdateListener(this);
+        try {
+            System.out.println("Client is up: " + client.isUp());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            System.out.println("Connecting to live feed...");
+            //boolean enabled = client.enableLiveFeed(); //to allow the updates to work
+            //System.out.println("Live feed connected: " + enabled);
+            client.addUpdateListener(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         messages = messagesList;
 
