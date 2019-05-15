@@ -5,8 +5,11 @@ import danstl.twooter.AccountManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -15,10 +18,13 @@ import javafx.stage.Stage;
 import twooter.Message;
 import twooter.TwooterClient;
 
+import java.io.IOException;
+
 public class HomePage {
 
     private Button composeButton;
     private Text accountLabel;
+    private TextField hashtagSearchBox;
 
     private ListView<Message> messages;
 
@@ -53,6 +59,17 @@ public class HomePage {
 
         header.getChildren().add(accountLabel);
 
+        hashtagSearchBox = new TextField();
+        hashtagSearchBox.setPromptText("#search");
+
+        hashtagSearchBox.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                doHashtagSearch(hashtagSearchBox.getText());
+            }
+        });
+
+        header.getChildren().add(hashtagSearchBox);
+
         messages = new ListView<>();
 
         messages.setCellFactory(param -> new MessageCell());
@@ -76,6 +93,28 @@ public class HomePage {
         stage.setScene(scene);
 
         stage.show();
+    }
+
+    private void doHashtagSearch(String query) {
+        if (!query.startsWith("#")) query = "#" + query;
+
+        try {
+            String[] msgs = client.getTagged(query);
+
+            messages.getItems().clear();
+
+            for (int i = 0; i < Math.min(10, msgs.length); i++) { //only fetch up to 10 messages to avoid spamming requests
+                try {
+                    Message msg = client.getMessage(msgs[i]);
+                    messages.getItems().add(msg);
+                } catch (Exception ignored) {
+                }
+            }
+
+            Utils.showMessage(Alert.AlertType.INFORMATION, String.join(", ", msgs));
+        } catch (IOException ex) {
+            Utils.showMessage(Alert.AlertType.ERROR, "Error fetching tweets for " + query);
+        }
     }
 
     private void composeTwoot() {
