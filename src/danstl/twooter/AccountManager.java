@@ -15,14 +15,10 @@ public class AccountManager {
     public AccountDetails getAccount() {
         if (account != null) return account; //the user's already specified their name
 
-        String name = UserSettings.getInstance().getUserName();
-
-        if (name != null) {
-            //todo attempt to resolve name/token
-        }
+        AccountDetails existingDetails = UserSettings.getInstance().getDetails();
 
         //we have to ask the user what name they want to use
-        account = new ChooseAccountPage(client).getAccountDetails();
+        account = new ChooseAccountPage(client, existingDetails).getAccountDetails();
 
         return account;
     }
