@@ -2,6 +2,8 @@ package danstl.twooter.gui;
 
 import danstl.twooter.AccountDetails;
 import danstl.twooter.AccountManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -30,6 +32,10 @@ public class HomePage {
 
     private TwooterClient client;
     private AccountDetails details;
+
+    private PostFeed feed;
+
+    private Stage stage;
 
     public HomePage(TwooterClient client) {
         this.client = client;
@@ -60,7 +66,7 @@ public class HomePage {
         header.getChildren().add(accountLabel);
 
         hashtagSearchBox = new TextField();
-        hashtagSearchBox.setPromptText("#search");
+        hashtagSearchBox.setPromptText("#hashtag / @username");
 
         hashtagSearchBox.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
@@ -84,37 +90,85 @@ public class HomePage {
             }
         });
 
-        new PostFeed(messages.getItems(), client); //post feed handles fetching messages and live updates
+        feed = new PostFeed(client); //post feed handles fetching messages and live updates
 
         container.setCenter(messages);
 
-        Stage stage = new Stage();
-        stage.setTitle("Twooter");
+        stage = new Stage();
         stage.setScene(scene);
+
+        showAllTwoots();
 
         stage.show();
     }
 
+    private void showAllTwoots() {
+        messages.setItems(feed.getMessages());
+
+        stage.setTitle("Twooter - all twoots");
+    }
+
     private void doHashtagSearch(String query) {
-        if (!query.startsWith("#")) query = "#" + query;
 
-        try {
-            String[] msgs = client.getTagged(query);
+        if (query.isEmpty() || query.equals("#") || query.equals("@")) {
+            showAllTwoots();
+            return;
+        }
 
-            messages.getItems().clear();
+        boolean hashtagSearch = query.startsWith("#");
 
-            for (int i = 0; i < Math.min(10, msgs.length); i++) { //only fetch up to 10 messages to avoid spamming requests
+        if (!hashtagSearch && !query.startsWith("@")) {
+            Utils.showMessage(Alert.AlertType.ERROR, "Unknown search query. Use # to search for hashtags, and @ to search for a user's twoots");
+            return;
+        }
+
+        ObservableList<Message> observableMsgs = FXCollections.observableArrayList();
+
+        if (hashtagSearch) {
+            String[] msgIds;
+
+            try {
+                msgIds = client.getTagged(query);
+            } catch (IOException ex) {
+                Utils.showMessage(Alert.AlertType.ERROR, "Error fetching tweets for hashtag " + query);
+                return;
+            }
+
+            if (msgIds == null || msgIds.length == 0) {
+                Utils.showMessage(Alert.AlertType.WARNING, "No twoots were found matching this hashtag");
+                return;
+            }
+
+            //fetch the actual twoots for each of the ids fetched above
+
+            for (int i = 0; i < Math.min(20, msgIds.length); i++) { //only fetch up to 20 messages to avoid spamming requests
                 try {
-                    Message msg = client.getMessage(msgs[i]);
-                    messages.getItems().add(msg);
-                } catch (Exception ignored) {
+                    Message msg = client.getMessage(msgIds[i]);
+                    observableMsgs.add(msg);
+                } catch (Exception ex) {
+                    System.out.println("Error fetching twoot:");
+                    ex.printStackTrace();
                 }
             }
 
-            Utils.showMessage(Alert.AlertType.INFORMATION, String.join(", ", msgs));
-        } catch (IOException ex) {
-            Utils.showMessage(Alert.AlertType.ERROR, "Error fetching tweets for " + query);
+        } else {
+            try {
+                Message[] msgs = client.getMessages(query.substring(1)); //remove the @
+                if (msgs == null || msgs.length == 0) {
+                    Utils.showMessage(Alert.AlertType.WARNING, "No twoots were found from this user");
+                    return;
+                }
+
+                observableMsgs.addAll(msgs);
+
+            } catch (IOException ex) {
+                Utils.showMessage(Alert.AlertType.ERROR, "Error fetching tweets for user " + query);
+                return;
+            }
         }
+
+        messages.setItems(observableMsgs);
+        stage.setTitle("Twooter - " + query);
     }
 
     private void composeTwoot() {

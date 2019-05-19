@@ -1,6 +1,7 @@
 package danstl.twooter.gui;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import twooter.Message;
 import twooter.TwooterClient;
@@ -23,10 +24,9 @@ public class PostFeed implements UpdateListener {
 
     /**
      * Creates a post feed listener
-     * @param messagesList the list to update when receiveing new messages
      * @param client the client instance
      */
-    public PostFeed(ObservableList<Message> messagesList, TwooterClient client) {
+    public PostFeed(TwooterClient client) {
         this.client = client;
 
         try {
@@ -37,14 +37,14 @@ public class PostFeed implements UpdateListener {
 
         try {
             System.out.println("Connecting to live feed...");
-            //boolean enabled = client.enableLiveFeed(); //to allow the updates to work
-            //System.out.println("Live feed connected: " + enabled);
+            boolean enabled = client.enableLiveFeed(); //to allow the updates to work
+            System.out.println("Live feed connected: " + enabled);
             client.addUpdateListener(this);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        messages = messagesList;
+        messages = FXCollections.observableArrayList(); //create our own observablelist since the main page's can change
 
         try {
             messages.addAll(client.getMessages()); //to make mutable
@@ -52,6 +52,14 @@ public class PostFeed implements UpdateListener {
             System.err.println("Error fetching messages");
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Gets the messages, updated via the the live feed
+     * @return the observable message list containing all of the current live twoots
+     */
+    public ObservableList<Message> getMessages() {
+        return messages;
     }
 
     /**
