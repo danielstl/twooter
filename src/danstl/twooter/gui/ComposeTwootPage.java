@@ -58,7 +58,8 @@ public class ComposeTwootPage {
 
         try {
             String res = client.postMessage(details.getToken(), details.getUserName(), content);
-            Utils.showMessage(Alert.AlertType.INFORMATION, "Posted twoot! " + res);
+            Utils.showMessage(Alert.AlertType.INFORMATION, "Posted twoot!");
+            System.out.println("Posted twoot: " + res);
 
         } catch (IOException ex) {
             Utils.showMessage(Alert.AlertType.ERROR, "Network error posting twoot!");
