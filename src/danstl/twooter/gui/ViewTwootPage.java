@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,20 +36,25 @@ public class ViewTwootPage {
 
     private final Message message; //the twoot to be displayed
     private final TwooterClient client; //client reference
+    private final PostFeed feed; //the live post feed, used in case the user follows or unfollows the user, in which case the filtered tweets need updating
 
     private Stage stage; //the window
     private Image twootImage; //base64 image to display, if the twoot is formatted using json
+
+    private Button followButton; //button to follow the user who posted this twoot
 
     /**
      * Creates and displays the twoot viewer window. Displays the twoot and additional information about a single twoot
      *
      * @param message the twoot to display
      * @param client  the client reference
+     * @param feed    the live post feed
      */
-    public ViewTwootPage(Message message, TwooterClient client) {
+    public ViewTwootPage(Message message, TwooterClient client, PostFeed feed) {
 
         this.message = message;
         this.client = client;
+        this.feed = feed;
 
         JsonTwoot json = JsonTwoot.resolve(message.message); //attempts to create a json twoot from the message, for images and other metadata
 
@@ -116,7 +122,7 @@ public class ViewTwootPage {
         bottom.getChildren().add(details);
 
         //Follow user button
-        Button followButton = new Button("+ Follow " + message.name);
+        followButton = new Button((UserSettings.getInstance().getFollowedAccounts().contains(message.name) ? "- Unfollow " : "+ Follow ") + message.name);
         followButton.setOnAction(this::followUser);
         followButton.setMinWidth(200);
         bottom.getChildren().add(followButton);
@@ -159,13 +165,16 @@ public class ViewTwootPage {
      */
     private void followUser(ActionEvent e) {
 
-        Set<String> following = UserSettings.getInstance().getFollowedAccounts();
+        List<String> following = UserSettings.getInstance().getFollowedAccounts();
 
-        if (following.add(message.name)) { //attempt to follow, will return false if already following (so unfollow instead)
-            Utils.showMessage(Alert.AlertType.INFORMATION, "Now following @" + message.name);
-        } else {
+        if (!following.contains(message.name)) { //if we're not already following them, follow them...
+            following.add(message.name);
+            followButton.setText("- Unfollow " + message.name);
+        } else { //...otherwise unfollow
             following.remove(message.name);
-            Utils.showMessage(Alert.AlertType.INFORMATION, "Now unfollowing @" + message.name);
+            followButton.setText("+ Follow " + message.name);
         }
+
+        feed.updateFollowerInfo(); //update the follow info for the post feed if the following only option is selected
     }
 }

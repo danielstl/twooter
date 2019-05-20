@@ -13,15 +13,18 @@ import twooter.TwooterClient;
 
 import java.io.IOException;
 
+/**
+ * Page for allowing the user to compose new twoots. Contains a text input field and a submit button to post to the feed
+ */
 public class ComposeTwootPage {
 
-    private Stage stage;
+    private Stage stage; //the window
 
-    private TextArea textArea;
-    private Button confirmButton;
+    private TextArea textArea; //the text area, where the user writes the twoot
+    private Button confirmButton; //button to submit the twoot
 
-    private AccountDetails details;
-    private TwooterClient client;
+    private AccountDetails details; //the account details (name, token) to use to submit the twoot to the service
+    private TwooterClient client; //the client to submit the twoot using
 
     public ComposeTwootPage(AccountDetails details, TwooterClient client) {
         this.details = details;
@@ -30,14 +33,14 @@ public class ComposeTwootPage {
         stage = new Stage();
 
         BorderPane container = new BorderPane();
-        container.setPadding(new Insets(10, 10, 10, 10));
+        container.setPadding(new Insets(10));
 
         Text twootLabel = new Text("What do you want to twoot?");
 
         textArea = new TextArea();
         confirmButton = new Button("Post");
 
-        confirmButton.setOnAction(e -> publishTwoot(textArea.getText()));
+        confirmButton.setOnAction(e -> publishTwoot(textArea.getText())); //publishTwoot with the text area text as the content parameter
 
         container.setTop(twootLabel);
         container.setCenter(textArea);
@@ -50,6 +53,10 @@ public class ComposeTwootPage {
         stage.showAndWait();
     }
 
+    /**
+     * Publishes the twoot, after validation, to the system
+     * @param content the twoot text
+     */
     private void publishTwoot(String content) {
         if (content == null || content.isEmpty()) {
             Utils.showMessage(Alert.AlertType.ERROR, "Failed to post empty twoot!");

@@ -105,6 +105,9 @@ public class ChooseAccountPage {
         return false;
     }
 
+    /**
+     * @return the account details which correspond to the username selected
+     */
     public AccountDetails getAccountDetails() {
         return accountDetails;
     }

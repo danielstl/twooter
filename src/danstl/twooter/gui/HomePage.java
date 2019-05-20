@@ -20,6 +20,10 @@ import twooter.TwooterClient;
 
 import java.io.IOException;
 
+/**
+ * Main page. Displays the twoot feed, contains a button to allow the user to post new twoots, and allows searching for
+ * hashtags and specific users
+ */
 public class HomePage {
 
     private Button composeButton; //button to compose a new twoot
@@ -55,19 +59,20 @@ public class HomePage {
 
         RadioButton allPosts = new RadioButton("All accounts");
         allPosts.setToggleGroup(feedToggle);
-        allPosts.setUserData(true);
+        allPosts.setUserData(false);
         allPosts.setSelected(true);
 
         RadioButton followingPosts = new RadioButton("Following only");
         followingPosts.setToggleGroup(feedToggle);
-        followingPosts.setUserData(false);
+        followingPosts.setUserData(true);
 
         feedToggle.selectedToggleProperty().addListener((e, oldVal, newVal) -> {
-            if ((boolean) newVal.getUserData()) { //true for all accounts, false if following only
+            onlyShowFollowing = (boolean) newVal.getUserData();
+            if (onlyShowFollowing) { //false for all accounts, true if for following only
                 hashtagSearchBox.clear();
-
-                showAllTwoots();
             }
+
+            showAllTwoots();
         });
 
         HBox feedToggles = new HBox();
@@ -81,21 +86,22 @@ public class HomePage {
 
         Scene scene = new Scene(container, 1000, 800);
 
+        details = new AccountManager(client).getAccount(); //will display a window allowing the user to pick their account name, or continue with their old one if existing
+
         composeButton = new Button("Compose Twoot");
-        composeButton.setOnAction(e -> composeTwoot());
-
-        header.getChildren().add(composeButton);
-
-        details = new AccountManager(client).getAccount();
+        composeButton.setDisable(details == null); //do not allow the user to post if they are not logged in
+        composeButton.setOnAction(e -> composeTwoot()); //call composeTwoot() when clicking the button
 
         header.getChildren().add(new Text(details == null ? "<Not logged in>" : details.getUserName()));
+
+        header.getChildren().add(composeButton);
 
         hashtagSearchBox = new TextField();
         hashtagSearchBox.setPromptText("#hashtag / @username");
 
         hashtagSearchBox.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
-                doHashtagSearch(hashtagSearchBox.getText());
+                doSearch(hashtagSearchBox.getText());
             }
         });
 
@@ -110,7 +116,7 @@ public class HomePage {
 
                 Message selected = messages.getSelectionModel().getSelectedItem();
 
-                new ViewTwootPage(selected, client);
+                new ViewTwootPage(selected, client, feed);
                 //your code here
             }
         });
@@ -127,9 +133,12 @@ public class HomePage {
         stage.show();
     }
 
+    /**
+     * Switches the messages feed to the live twoot feed
+     */
     private void showAllTwoots() {
         if (onlyShowFollowing) {
-            messages.setItems(null); //TODO
+            messages.setItems(feed.getFollowingMessages());
         } else {
             messages.setItems(feed.getMessages());
         }
@@ -137,9 +146,18 @@ public class HomePage {
         stage.setTitle("Twooter - all twoots");
     }
 
-    private void doHashtagSearch(String query) {
+    /**
+     * Attempts to either find a user using @syntax, or search for twoots with a specific tag with #syntax.
+     * Other prefixes will result in an error message being displayed to the user
+     *
+     * If successful, the feed will be replaced with one which meets the users search criteria. For example only twoots
+     * from a specific tag or user
+     *
+     * @param query the entire search query
+     */
+    private void doSearch(String query) {
 
-        if (query.isEmpty() || query.equals("#") || query.equals("@")) {
+        if (query.isEmpty() || query.equals("#") || query.equals("@")) { //if no search content has been entered, reset the feed
             showAllTwoots();
             return;
         }
@@ -151,13 +169,13 @@ public class HomePage {
             return;
         }
 
-        ObservableList<Message> observableMsgs = FXCollections.observableArrayList();
+        ObservableList<Message> observableMsgs = FXCollections.observableArrayList(); //create a new observable list
 
         if (hashtagSearch) {
             String[] msgIds;
 
             try {
-                msgIds = client.getTagged(query);
+                msgIds = client.getTagged(query); //fetch message ids which match the query
             } catch (IOException ex) {
                 Utils.showMessage(Alert.AlertType.ERROR, "Error fetching tweets for hashtag " + query);
                 return;
@@ -182,7 +200,8 @@ public class HomePage {
 
         } else {
             try {
-                Message[] msgs = client.getMessages(query.substring(1)); //remove the @
+                Message[] msgs = client.getMessages(query.substring(1)); //remove the @, and fetch twoots from the user
+
                 if (msgs == null || msgs.length == 0) {
                     Utils.showMessage(Alert.AlertType.WARNING, "No twoots were found from this user");
                     return;
@@ -196,10 +215,13 @@ public class HomePage {
             }
         }
 
-        messages.setItems(observableMsgs);
+        messages.setItems(observableMsgs); //change to the new feed
         stage.setTitle("Twooter - " + query);
     }
 
+    /**
+     * Displays the twoot composition window
+     */
     private void composeTwoot() {
         new ComposeTwootPage(details, client);
     }

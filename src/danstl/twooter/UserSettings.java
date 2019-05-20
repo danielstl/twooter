@@ -25,7 +25,7 @@ public class UserSettings {
     }
 
     private AccountDetails details;
-    private Set<String> followedAccounts;
+    private List<String> followedAccounts;
 
     public UserSettings() {
 
@@ -40,11 +40,14 @@ public class UserSettings {
         save();
     }
 
-    public Set<String> getFollowedAccounts() {
-        return followedAccounts == null ? (followedAccounts = new HashSet<>()) : followedAccounts;
+    public List<String> getFollowedAccounts() {
+        if (followedAccounts == null)
+            followedAccounts = new ArrayList<>();
+        System.out.println("ACCESS");
+        return followedAccounts;
     }
 
-    public void setFollowedAccounts(Set<String> followedAccounts) {
+    public void setFollowedAccounts(List<String> followedAccounts) {
         this.followedAccounts = followedAccounts;
         save();
     }
