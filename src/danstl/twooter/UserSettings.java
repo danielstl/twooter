@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class UserSettings {
 
@@ -22,7 +25,7 @@ public class UserSettings {
     }
 
     private AccountDetails details;
-    private List<String> followedAccounts;
+    private Set<String> followedAccounts;
 
     public UserSettings() {
 
@@ -37,11 +40,11 @@ public class UserSettings {
         save();
     }
 
-    public List<String> getFollowedAccounts() {
-        return followedAccounts;
+    public Set<String> getFollowedAccounts() {
+        return followedAccounts == null ? (followedAccounts = new HashSet<>()) : followedAccounts;
     }
 
-    public void setFollowedAccounts(List<String> followedAccounts) {
+    public void setFollowedAccounts(Set<String> followedAccounts) {
         this.followedAccounts = followedAccounts;
         save();
     }
