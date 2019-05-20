@@ -8,15 +8,32 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Class for managing the user's account. Will attempt to access the existing details and show this in the account
+ * picker UI if they have an existing name, otherwise will show the normal name picker window
+ *
+ * Also in charge of refreshing the account token
+ */
 public class AccountManager {
 
-    private TwooterClient client;
-    private AccountDetails account;
+    private TwooterClient client; //the client to use for refreshing token and displaying the account picker window
+    private AccountDetails account; //the user's account details
 
+    /**
+     * Creates an account manager
+     * @param client the twooter client instance
+     */
     public AccountManager(TwooterClient client) {
         this.client = client;
     }
 
+    /**
+     * Will check if the user's account details are already saved. If so, it will return them. Otherwise, it will
+     * display the account picker window with the option of using the user's previous name if that is stored in
+     * the settings.txt user settings file
+     *
+     * @return the account details
+     */
     public AccountDetails getAccount() {
         if (account != null) return account; //the user's already specified their name
 

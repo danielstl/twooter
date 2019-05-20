@@ -7,11 +7,11 @@ import com.google.gson.Gson;
  */
 public class JsonTwoot {
 
-    private static final String PAYLOAD_NAME = "data:twooter/formatted;json,";
+    private static final String PAYLOAD_NAME = "data:twooter/formatted;json,"; //the prefix at the start of json twoots
 
-    private String agent;
-    private String[] images;
-    private String text;
+    private String agent; //the user agent to specify where the twoot was posted from
+    private String[] images; //base64 encoded images
+    private String text; //the text content of the twoot
 
     /**
      * Attempts to resolve the specified twoot text into a JsonTwoot. Will return null if the text is not in the correct format
