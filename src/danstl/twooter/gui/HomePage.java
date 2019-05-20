@@ -7,14 +7,12 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import twooter.Message;
@@ -24,18 +22,19 @@ import java.io.IOException;
 
 public class HomePage {
 
-    private Button composeButton;
-    private Text accountLabel;
-    private TextField hashtagSearchBox;
+    private Button composeButton; //button to compose a new twoot
+    private TextField hashtagSearchBox; //search box to search for users and hashtags
 
-    private ListView<Message> messages;
+    private ListView<Message> messages; //the list of messages to display in the gui
 
-    private TwooterClient client;
-    private AccountDetails details;
+    private TwooterClient client; //client reference for fetching messages
+    private AccountDetails details; //the account details (username, token) for the specified user
 
-    private PostFeed feed;
+    private PostFeed feed; //feed to automatically update the messages shown in the gui if not doing a search
 
-    private Stage stage;
+    private Stage stage; //the window reference
+
+    private boolean onlyShowFollowing; //true if only twoots from followed users should be shown
 
     public HomePage(TwooterClient client) {
         this.client = client;
@@ -43,16 +42,44 @@ public class HomePage {
         BorderPane container = new BorderPane();
         container.setPadding(new Insets(5));
 
+        VBox topBar = new VBox();
+        topBar.setPadding(new Insets(5));
+
         HBox header = new HBox();
-        header.setPadding(new Insets(5));
         header.setSpacing(10);
         header.setAlignment(Pos.CENTER);
 
-        container.setTop(header);
+        topBar.getChildren().add(header);
+
+        ToggleGroup feedToggle = new ToggleGroup();
+
+        RadioButton allPosts = new RadioButton("All accounts");
+        allPosts.setToggleGroup(feedToggle);
+        allPosts.setUserData(true);
+        allPosts.setSelected(true);
+
+        RadioButton followingPosts = new RadioButton("Following only");
+        followingPosts.setToggleGroup(feedToggle);
+        followingPosts.setUserData(false);
+
+        feedToggle.selectedToggleProperty().addListener((e, oldVal, newVal) -> {
+            if ((boolean) newVal.getUserData()) { //true for all accounts, false if following only
+                hashtagSearchBox.clear();
+
+                showAllTwoots();
+            }
+        });
+
+        HBox feedToggles = new HBox();
+        feedToggles.setSpacing(10);
+        feedToggles.getChildren().add(allPosts);
+        feedToggles.getChildren().add(followingPosts);
+
+        topBar.getChildren().add(feedToggles);
+
+        container.setTop(topBar);
 
         Scene scene = new Scene(container, 1000, 800);
-
-        header.getChildren().add(new Text("Twooter"));
 
         composeButton = new Button("Compose Twoot");
         composeButton.setOnAction(e -> composeTwoot());
@@ -61,9 +88,7 @@ public class HomePage {
 
         details = new AccountManager(client).getAccount();
 
-        accountLabel = new Text(details == null ? "<Not logged in>" : details.getUserName());
-
-        header.getChildren().add(accountLabel);
+        header.getChildren().add(new Text(details == null ? "<Not logged in>" : details.getUserName()));
 
         hashtagSearchBox = new TextField();
         hashtagSearchBox.setPromptText("#hashtag / @username");
@@ -103,7 +128,11 @@ public class HomePage {
     }
 
     private void showAllTwoots() {
-        messages.setItems(feed.getMessages());
+        if (onlyShowFollowing) {
+            messages.setItems(null); //TODO
+        } else {
+            messages.setItems(feed.getMessages());
+        }
 
         stage.setTitle("Twooter - all twoots");
     }

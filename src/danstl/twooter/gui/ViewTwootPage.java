@@ -67,7 +67,7 @@ public class ViewTwootPage {
         container.setTop(new Text("Viewing Twoot"));
 
         //Images, if twoot is formatted in json format
-        if (json != null && json.getImages().length > 0) {
+        if (json != null && json.getImages() != null && json.getImages().length > 0) {
             try {
                 String img = json.getImages()[0];
 
@@ -82,11 +82,14 @@ public class ViewTwootPage {
         }
 
         HBox bottom = new HBox();
+        bottom.setPadding(new Insets(5));
 
         VBox details = new VBox();
 
         //Twoot details
-        details.getChildren().add(new Text("Twoot Details"));
+        Text twootDetailsHeader = new Text("Twoot Details");
+        twootDetailsHeader.setStyle("-fx-font-weight: 800");
+        details.getChildren().add(twootDetailsHeader);
         details.getChildren().add(new Text("Published: " + TWEET_TIMESTAMP_FORMAT.format(Instant.ofEpochMilli(message.published).atZone(ZoneId.systemDefault()).toLocalDateTime())));
         details.getChildren().add(new Text("Author: " + message.name));
 
