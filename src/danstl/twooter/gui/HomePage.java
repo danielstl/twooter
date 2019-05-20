@@ -139,11 +139,11 @@ public class HomePage {
     private void showAllTwoots() {
         if (onlyShowFollowing) {
             messages.setItems(feed.getFollowingMessages());
+            stage.setTitle("Twooter - following only");
         } else {
             messages.setItems(feed.getMessages());
+            stage.setTitle("Twooter - all twoots");
         }
-
-        stage.setTitle("Twooter - all twoots");
     }
 
     /**

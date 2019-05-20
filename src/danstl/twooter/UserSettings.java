@@ -94,7 +94,7 @@ public class UserSettings {
     /**
      * Saves the settings to disk via json. Parsed through gson
      */
-    private static void save() {
+    public static void save() {
         Path settings = Paths.get(System.getProperty("user.dir"), USER_SETTINGS_FILE);
 
         try {

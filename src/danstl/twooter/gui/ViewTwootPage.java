@@ -176,5 +176,6 @@ public class ViewTwootPage {
         }
 
         feed.updateFollowerInfo(); //update the follow info for the post feed if the following only option is selected
+        UserSettings.save(); //to update the following info to disk
     }
 }
